@@ -1,19 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const jsdom = require("jsdom");
+const dotenv = require("dotenv");
 
-const { JSDOM } = jsdom;
 const app = express();
-const PORT = 3000;
+const { JSDOM } = jsdom;
+dotenv.config();
 app.use(cors());
 
 app.get("/", (req, res)=> {
-  res.status(200).json("Hello world");
+  res.status(200).json("6th Sem MiniPro...");
 })
-
-app.get('/home', (req, res) => {
-  res.status(200).json('Welcome, your app is working well');
-});
 
 // CodeChef user profile
 app.get("/codechef/:username", async (req, res) => {
@@ -51,7 +48,7 @@ app.get("/codechef/:username", async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
