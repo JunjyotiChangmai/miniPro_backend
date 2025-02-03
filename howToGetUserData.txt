@@ -1,0 +1,11 @@
+1. CODECHEF USER DATA -->
+    1. Api for user profile data [from unofficial codechef api] : https://codechef-api.vercel.app/handle/${username}
+    2. Some missing information will be extracted by using Webscrapping from URL : https://www.codechef.com/users/${username}
+
+2. CODEFORCES USER DATA -->
+    1. Api for user profile data : https://codeforces.com/api/user.info?handles=Changmai
+    2. api for user submission history [for heatMap creation] : https://codeforces.com/api/user.status?handle=${username}&from=1
+
+3. LEETCODE USER DATA -->
+
+4. GFG USER DATA -->
