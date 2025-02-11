@@ -1,5 +1,6 @@
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const User = require("../model/user.js");
 
 function handleRoot(req, res) {
     res.status(200).json("6th Sem MiniPro...");
