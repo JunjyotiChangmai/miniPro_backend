@@ -12,6 +12,8 @@ const app = express();
 mongoose.connect(mongoDB_url).then(()=> console.log("MongoDB connected..."));
 
 app.use(cors());
+app.use(express.json({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use("/", router);
 
 app.listen(port, () => console.log(`Server is running on http://localhost:${port}`));
