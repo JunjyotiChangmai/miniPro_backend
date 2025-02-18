@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const router = require("./routes/api.js")
 
-const port  = process.env.PORT;
+const port = process.env.PORT;
 const mongoDB_url = process.env.mongoDB;
 const app = express();
 

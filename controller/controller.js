@@ -1,6 +1,7 @@
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const User = require("../model/user.js");
+const { response } = require("express");
 
 function handleRoot(req, res) {
     res.status(200).json("6th Sem MiniPro...");
@@ -40,8 +41,26 @@ async function handleCodeChefData(req, res) {
 
 // Codeforce data handle
 async function handleCodeforcesData(req, res) {
-    const { username } = req.params;
-    res.status(200).json({"message": username});
+    try {
+        const { username } = req.params;
+        const getUserdataUrl = `https://codeforces.com/api/user.info?handles=${username}`;
+        const userSubmissionHistoryUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1`;
+        const userRatingListUrl = `https://codeforces.com/api/user.rating?handle=${username}`;
+
+        const userData = await fetch(getUserdataUrl).then(response=> response.json()).then(data=> data);
+        const userSubHistory = await fetch(userSubmissionHistoryUrl).then(response=> response.json()).then(data=> data);
+        const userRatingList = await fetch(userRatingListUrl).then(response => response.json()).then(data => data);
+        
+        const userProfiledata = {
+            userInformation: userData.result,
+            submissionHistory: userSubHistory.result,
+            rating: userRatingList.result,
+        };
+
+        res.status(200).json(userProfiledata);
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
 }
 
 // Leetcode data handle
