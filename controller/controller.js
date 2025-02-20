@@ -9,11 +9,11 @@ function handleRoot(req, res) {
 
 // Codechef data handle
 async function handleCodeChefData(req, res) {
-    const { username } = req.params;
-    const targetUrl = `https://www.codechef.com/users/${username}`;
-    const codechefAPI = `https://codechef-api.vercel.app/handle/${username}`;
-
     try {
+        const { username } = req.params;
+        const targetUrl = `https://www.codechef.com/users/${username}`;
+        const codechefAPI = `https://codechef-api.vercel.app/handle/${username}`;
+
         const response = await fetch(targetUrl);
         const CCProfile = await fetch(codechefAPI).then(response => response.json()).then(data => data);
 
@@ -43,18 +43,41 @@ async function handleCodeChefData(req, res) {
 async function handleCodeforcesData(req, res) {
     try {
         const { username } = req.params;
+
+        // Official API of Codeforces
         const getUserdataUrl = `https://codeforces.com/api/user.info?handles=${username}`;
         const userSubmissionHistoryUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1`;
         const userRatingListUrl = `https://codeforces.com/api/user.rating?handle=${username}`;
 
-        const userData = await fetch(getUserdataUrl).then(response=> response.json()).then(data=> data);
-        const userSubHistory = await fetch(userSubmissionHistoryUrl).then(response=> response.json()).then(data=> data);
+        // Geting user data from official api of Codeforces
+        const userData = await fetch(getUserdataUrl).then(response => response.json()).then(data => data);
+        const userSubHistory = await fetch(userSubmissionHistoryUrl).then(response => response.json()).then(data => data);
         const userRatingList = await fetch(userRatingListUrl).then(response => response.json()).then(data => data);
-        
+
+        //create heatmap from submission history...................
+        // to make submission time into date formate
+        const formatDate = (timestamp) => {
+            const date = new Date(timestamp * 1000);
+            return date.toISOString().split('T')[0];
+        };
+
+        // Count submissions per date
+        const dateCounts = {};
+        userSubHistory.result.forEach(sub => {
+            const date = formatDate(sub.creationTimeSeconds);
+            dateCounts[date] = (dateCounts[date] || 0) + 1;
+        });
+
+        const uniqueDates = Object.keys(dateCounts).sort();
+        const heatMapData = uniqueDates.map((date) => ({
+            date: date,
+            value: dateCounts[date]
+        }));
+
         const userProfiledata = {
-            userInformation: userData.result,
-            submissionHistory: userSubHistory.result,
-            rating: userRatingList.result,
+            userInfo: userData.result,
+            heatMap: heatMapData,
+            ratingData: userRatingList.result,
         };
 
         res.status(200).json(userProfiledata);
@@ -65,14 +88,58 @@ async function handleCodeforcesData(req, res) {
 
 // Leetcode data handle
 async function handleLeetcodeData(req, res) {
-    const { username } = req.params;
-    res.status(200).json({"message": username});
+    try {
+        const { username } = req.params;
+        const gfgURL = `https://www.geeksforgeeks.org/user/${username}`;
+
+        const response = await fetch(gfgURL);
+
+        if (response.ok) {
+            const d = await response.text();
+            const data = { data: d };
+            const dom = new JSDOM(data.data);
+            const document = dom.window.document;
+
+            const nextDataScript = document.getElementById("__NEXT_DATA__");
+            const nextData = JSON.parse(nextDataScript.textContent);
+
+            res.status(200).send(nextData.props.pageProps);
+        }
+        else {
+            res.status(response.status).send("Error fetching data from CodeChef");
+        }
+
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
 }
 
 //GFG data handle
 async function handleGFGData(req, res) {
-    const { username } = req.params;
-    res.status(200).json({"message": username});
+    try {
+        const { username } = req.params;
+        const gfgURL = `https://www.geeksforgeeks.org/user/${username}`;
+
+        const response = await fetch(gfgURL);
+
+        if (response.ok) {
+            const d = await response.text();
+            const data = { data: d };
+            const dom = new JSDOM(data.data);
+            const document = dom.window.document;
+
+            const nextDataScript = document.getElementById("__NEXT_DATA__");
+            const nextData = JSON.parse(nextDataScript.textContent);
+
+            res.status(200).send(nextData.props.pageProps);
+        }
+        else {
+            res.status(response.status).send("Error fetching data from CodeChef");
+        }
+
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
 }
 
 module.exports = { handleRoot, handleCodeChefData, handleCodeforcesData, handleLeetcodeData, handleGFGData };
