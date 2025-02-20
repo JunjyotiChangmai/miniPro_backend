@@ -90,9 +90,9 @@ async function handleCodeforcesData(req, res) {
 async function handleLeetcodeData(req, res) {
     try {
         const { username } = req.params;
-        const gfgURL = `https://www.geeksforgeeks.org/user/${username}`;
+        const leetcodeURL = `https://leetcode.com/u/${username}`;
 
-        const response = await fetch(gfgURL);
+        const response = await fetch(leetcodeURL, { method: 'GET' });
 
         if (response.ok) {
             const d = await response.text();
@@ -106,7 +106,7 @@ async function handleLeetcodeData(req, res) {
             res.status(200).send(nextData.props.pageProps);
         }
         else {
-            res.status(response.status).send("Error fetching data from CodeChef");
+            res.status(response.status).send("Error fetching data from Leetcode");
         }
 
     } catch (error) {
