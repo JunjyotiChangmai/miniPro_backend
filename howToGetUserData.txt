@@ -8,5 +8,7 @@
     3. Api for user rating change : https://codeforces.com/api/user.rating?handle=${username}
 
 3. LEETCODE USER DATA -->
+    1. Data fetching using leetcode graphQL : https://leetcode.com/graphql (it is bit complicate to understand because there are limited resource related to leetcode graphQL)
 
 4. GFG USER DATA -->
+    1. User data will be extracted by using Webscrapping from URL : https://www.geeksforgeeks.org/user/${username}

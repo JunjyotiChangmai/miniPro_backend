@@ -1,7 +1,6 @@
+const axios = require('axios');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-const User = require("../model/user.js");
-const { response } = require("express");
 
 function handleRoot(req, res) {
     res.status(200).json("6th Sem MiniPro...");
@@ -90,25 +89,68 @@ async function handleCodeforcesData(req, res) {
 async function handleLeetcodeData(req, res) {
     try {
         const { username } = req.params;
-        const leetcodeURL = `https://leetcode.com/u/${username}`;
 
-        const response = await fetch(leetcodeURL, { method: 'GET' });
+        // leetcode user data fetching using leetcode graphQL
+        const response = await axios.post(
+            'https://leetcode.com/graphql',
+            {
+                query: `
+                query getUserProfile($username: String!) {
+                    matchedUser(username: $username) {
+                        username
+                        profile {
+                            realName
+                            ranking
+                            userAvatar
+                            reputation
+                            aboutMe
+                            school
+                            countryName
+                            company
+                            skillTags
+                        }
+                        submitStats: submitStatsGlobal {
+                            acSubmissionNum {
+                                difficulty
+                                count
+                                submissions
+                            }
+                        }
+                        userCalendar(year: 0) {
+                            activeYears
+                            streak      
+                            totalActiveDays      
+                            dccBadges {        
+                                timestamp        
+                                badge {          
+                                    name          
+                                    icon
+                                }
+                            }
+                            submissionCalendar 
+                        }
+                        
+                    }
+                }
+                `,
+                variables: { username }
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                    'Referer': `https://leetcode.com/${username}/`,
+                }
+            }
+        );
 
-        if (response.ok) {
-            const d = await response.text();
-            const data = { data: d };
-            const dom = new JSDOM(data.data);
-            const document = dom.window.document;
-
-            const nextDataScript = document.getElementById("__NEXT_DATA__");
-            const nextData = JSON.parse(nextDataScript.textContent);
-
-            res.status(200).send(nextData.props.pageProps);
+        if (response.status === 200) {
+            // leetcode userdata
+            const userData = response.data.data.matchedUser;
+            res.status(200).json(userData);
+        } else {
+            res.status(response.status).send("Error fetching data from LeetCode");
         }
-        else {
-            res.status(response.status).send("Error fetching data from Leetcode");
-        }
-
     } catch (error) {
         res.status(500).send("Internal Server Error");
     }
