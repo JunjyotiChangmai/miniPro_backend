@@ -26,8 +26,8 @@ async function handleCodeChefData(req, res) {
 
             const newData = { problemSolve: parseInt(totalProb), };
 
-            const codeChefUserData = { ...newData, ...CCProfile };
-            res.status(200).json(codeChefUserData);
+            const userProfileData = { ...newData, ...CCProfile };
+            res.status(200).json(userProfileData);
         }
         else {
             res.status(response.status).send("Error fetching data from CodeChef");
@@ -73,13 +73,13 @@ async function handleCodeforcesData(req, res) {
             value: dateCounts[date]
         }));
 
-        const userProfiledata = {
+        const userProfileData = {
             userInfo: userData.result,
             heatMap: heatMapData,
             ratingData: userRatingList.result,
         };
 
-        res.status(200).json(userProfiledata);
+        res.status(200).json(userProfileData);
     } catch (error) {
         res.status(500).send("Internal Server Error");
     }
@@ -172,8 +172,38 @@ async function handleGFGData(req, res) {
 
             const nextDataScript = document.getElementById("__NEXT_DATA__");
             const nextData = JSON.parse(nextDataScript.textContent);
+            const userData = nextData.props.pageProps;
 
-            res.status(200).send(nextData.props.pageProps);
+            // Creating heatMap data
+            const createHeatMap = userData.heatMapData.result;
+            function convertHeatMapToDateAndValue(heatMap) {
+                return Object.entries(heatMap).map(([date, value])=> ({
+                    date,
+                    value
+                }));
+            }
+            const heatMap = convertHeatMapToDateAndValue(createHeatMap);
+            
+            // Extracting user contest data
+            const contest_rating_data = {
+                contest_user_global_rank : userData.contestData.user_global_rank,
+                contest_total_users : userData.contestData.total_users,
+                contest_user_position : userData.contestData.user_position,
+                contest_user_stars : userData.contestData.user_stars,
+                contest_current_rating : userData.contestData.user_contest_data.current_rating,
+                contest_star_colour_codes : userData.contestData.star_colour_codes,
+            }
+
+
+            const userProfileData = {
+                userHandle: userData.userHandle,
+                userInfo: ({...userData.userInfo, ...contest_rating_data}),
+                userSubmissionsInfo: userData.userSubmissionsInfo,
+                heatMap: heatMap,
+                ratingData: userData.contestData.user_contest_data.contest_data,
+            }
+
+            res.status(200).send(userProfileData);
         }
         else {
             res.status(response.status).send("Error fetching data from CodeChef");
