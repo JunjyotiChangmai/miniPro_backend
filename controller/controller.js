@@ -156,7 +156,7 @@ async function handleLeetcodeData(req, res) {
     }
 }
 
-//GFG data handle
+// GFG data handle
 async function handleGFGData(req, res) {
     try {
         const { username } = req.params;
@@ -193,11 +193,14 @@ async function handleGFGData(req, res) {
                 contest_current_rating : userData.contestData.user_contest_data.current_rating,
                 contest_star_colour_codes : userData.contestData.star_colour_codes,
             }
+            
+            const userHandle = {
+                userHandle : userData.userHandle,
+            }
 
 
             const userProfileData = {
-                userHandle: userData.userHandle,
-                userInfo: ({...userData.userInfo, ...contest_rating_data}),
+                userInfo: ({...userHandle, ...userData.userInfo, ...contest_rating_data}),
                 userSubmissionsInfo: userData.userSubmissionsInfo,
                 heatMap: heatMap,
                 ratingData: userData.contestData.user_contest_data.contest_data,
