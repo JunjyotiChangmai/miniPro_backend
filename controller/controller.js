@@ -91,7 +91,7 @@ async function handleLeetcodeData(req, res) {
         const { username } = req.params;
 
         // leetcode user data fetching using leetcode graphQL
-        const response = await axios.post(
+        const userResponse = await axios.post(
             'https://leetcode.com/graphql',
             {
                 query: `
@@ -129,7 +129,20 @@ async function handleLeetcodeData(req, res) {
                             }
                             submissionCalendar 
                         }
-                        
+                        tagProblemCounts {
+                            advanced {
+                                tagName
+                                problemsSolved
+                            }
+                            intermediate {
+                                tagName
+                                problemsSolved
+                            }
+                            fundamental {
+                                tagName
+                                problemsSolved
+                            }
+                        }
                     }
                 }
                 `,
@@ -144,10 +157,57 @@ async function handleLeetcodeData(req, res) {
             }
         );
 
-        if (response.status === 200) {
+        // leetcode user contest data fetching using leetcode graphQL
+        const contetResponse = await axios.post(
+            'https://leetcode.com/graphql',
+            {
+                query: `
+                    query getUserContestRankingInfo($username: String!) {
+                        userContestRanking(username: $username) {
+                            attendedContestsCount
+                            rating
+                            globalRanking
+                            totalParticipants
+                            topPercentage
+                            badge {
+                                name
+                                icon
+                            }
+                        }
+                        userContestRankingHistory(username: $username) {
+                            attended
+                            trendDirection
+                            problemsSolved
+                            totalProblems
+                            finishTimeInSeconds
+                            rating
+                            ranking
+                            contest {
+                                title
+                                startTime
+                            }
+                        }
+                    }
+        `,
+                variables: { username }
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                    'Referer': `https://leetcode.com/${username}/`,
+                }
+            }
+        );
+
+        if (userResponse.status === 200 && contetResponse.status === 200) {
             // leetcode userdata
-            const userData = response.data.data.matchedUser;
-            res.status(200).json(userData);
+            const userResData = userResponse.data.data.matchedUser;
+            const userContestResData = contetResponse.data.data;
+
+            const userProfileData = ({...userResData, ...userContestResData});
+
+            res.status(200).json(userProfileData);
         } else {
             res.status(response.status).send("Error fetching data from LeetCode");
         }
@@ -177,30 +237,29 @@ async function handleGFGData(req, res) {
             // Creating heatMap data
             const createHeatMap = userData.heatMapData.result;
             function convertHeatMapToDateAndValue(heatMap) {
-                return Object.entries(heatMap).map(([date, value])=> ({
+                return Object.entries(heatMap).map(([date, value]) => ({
                     date,
                     value
                 }));
             }
             const heatMap = convertHeatMapToDateAndValue(createHeatMap);
-            
+
             // Extracting user contest data
             const contest_rating_data = {
-                contest_user_global_rank : userData.contestData.user_global_rank,
-                contest_total_users : userData.contestData.total_users,
-                contest_user_position : userData.contestData.user_position,
-                contest_user_stars : userData.contestData.user_stars,
-                contest_current_rating : userData.contestData.user_contest_data.current_rating,
-                contest_star_colour_codes : userData.contestData.star_colour_codes,
-            }
-            
-            const userHandle = {
-                userHandle : userData.userHandle,
+                contest_user_global_rank: userData.contestData.user_global_rank,
+                contest_total_users: userData.contestData.total_users,
+                contest_user_position: userData.contestData.user_position,
+                contest_user_stars: userData.contestData.user_stars,
+                contest_current_rating: userData.contestData.user_contest_data.current_rating,
+                contest_star_colour_codes: userData.contestData.star_colour_codes,
             }
 
+            const userHandle = {
+                userHandle: userData.userHandle,
+            }
 
             const userProfileData = {
-                userInfo: ({...userHandle, ...userData.userInfo, ...contest_rating_data}),
+                userInfo: ({ ...userHandle, ...userData.userInfo, ...contest_rating_data }),
                 userSubmissionsInfo: userData.userSubmissionsInfo,
                 heatMap: heatMap,
                 ratingData: userData.contestData.user_contest_data.contest_data,
@@ -209,7 +268,7 @@ async function handleGFGData(req, res) {
             res.status(200).send(userProfileData);
         }
         else {
-            res.status(response.status).send("Error fetching data from CodeChef");
+            res.status(response.status).send("Error fetching data from GFG");
         }
 
     } catch (error) {
