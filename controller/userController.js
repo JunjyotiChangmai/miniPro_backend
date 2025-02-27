@@ -11,7 +11,7 @@ async function handleSignup(req, res) {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         const user = await User.create({
-            fullName: req.body.fullName,
+            name: req.body.name,
             username: req.body.username,
             email: req.body.email,
             password: hashedPassword,
@@ -35,8 +35,7 @@ async function handleSignin(req, res) {
 
         if(!user){
             res.status(401).json("invalid email or password");
-        }
-            
+        }   
         
         //compare hashed password
         const passMatch = await bcrypt.compare(req.body.password, user.password);
@@ -44,11 +43,8 @@ async function handleSignin(req, res) {
             res.status(200).json("invalid email or password");
         }
 
-
         //jwt for sessions
         let token = jwt.sign({email:user.email},process.env.jwtSecret,);
-        console.log(token);
-        
         
         //sending the token to server as cookie
         res.cookie("token",token,{httpOnly: true,secure: false});
