@@ -1,4 +1,4 @@
-const User = require("../model/user.js");
+const {User, UserData} = require("../model/user.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -15,6 +15,11 @@ async function handleSignup(req, res) {
             username: req.body.username,
             email: req.body.email,
             password: hashedPassword,
+        })
+
+        const userData = await UserData.create({
+            name: req.body.name,
+            username: req.body.username,
         })
 
         res.status(200).json("user added");

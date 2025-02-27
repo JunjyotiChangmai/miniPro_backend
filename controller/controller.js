@@ -1,5 +1,6 @@
 const axios = require('axios');
 const jsdom = require("jsdom");
+const {User, UserData} = require("../model/user");
 const { JSDOM } = jsdom;
 
 function handleRoot(req, res) {
@@ -276,4 +277,16 @@ async function handleGFGData(req, res) {
     }
 }
 
-module.exports = { handleRoot, handleCodeChefData, handleCodeforcesData, handleLeetcodeData, handleGFGData };
+// To send all user data to the client
+async function handleUserData(req, res) {
+    try {
+        const { username } = req.params;
+        const userdata = await UserData.find({username});
+        
+        res.status(200).json(userdata);
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+module.exports = { handleRoot, handleCodeChefData, handleCodeforcesData, handleLeetcodeData, handleGFGData, handleUserData };
