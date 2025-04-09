@@ -1,6 +1,5 @@
 const axios = require('axios');
 const jsdom = require("jsdom");
-const {User, UserData} = require("../model/user");
 const { JSDOM } = jsdom;
 
 function handleRoot(req, res) {
@@ -8,9 +7,7 @@ function handleRoot(req, res) {
 }
 
 // Codechef data handle
-async function handleCodeChefData(req, res) {
-    try {
-        const { username } = req.params;
+async function handleCodeChefData( username ) {
         const targetUrl = `https://www.codechef.com/users/${username}`;
         const codechefAPI = `https://codechef-api.vercel.app/handle/${username}`;
 
@@ -28,22 +25,16 @@ async function handleCodeChefData(req, res) {
             const newData = { problemSolve: parseInt(totalProb), };
 
             const userProfileData = { ...newData, ...CCProfile };
-            res.status(200).json(userProfileData);
+
+            return userProfileData;
         }
         else {
-            res.status(response.status).send("Error fetching data from CodeChef");
+            return 0;
         }
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        res.status(500).send("Internal Server Error");
-    }
 }
 
 // Codeforce data handle
-async function handleCodeforcesData(req, res) {
-    try {
-        const { username } = req.params;
-
+async function handleCodeforcesData( username ) {
         // Official API of Codeforces
         const getUserdataUrl = `https://codeforces.com/api/user.info?handles=${username}`;
         const userSubmissionHistoryUrl = `https://codeforces.com/api/user.status?handle=${username}&from=1`;
@@ -80,17 +71,12 @@ async function handleCodeforcesData(req, res) {
             ratingData: userRatingList.result,
         };
 
-        res.status(200).json(userProfileData);
-    } catch (error) {
-        res.status(500).send("Internal Server Error");
-    }
+        console.log(userProfileData)
+        return userProfileData;
 }
 
 // Leetcode data handle
-async function handleLeetcodeData(req, res) {
-    try {
-        const { username } = req.params;
-
+async function handleLeetcodeData( username ) {
         // leetcode user data fetching using leetcode graphQL
         const userResponse = await axios.post(
             'https://leetcode.com/graphql',
@@ -208,19 +194,15 @@ async function handleLeetcodeData(req, res) {
 
             const userProfileData = ({...userResData, ...userContestResData});
 
-            res.status(200).json(userProfileData);
+            console.log(userProfileData)
+            return userProfileData;
         } else {
-            res.status(response.status).send("Error fetching data from LeetCode");
+            return 0;
         }
-    } catch (error) {
-        res.status(500).send("Internal Server Error");
-    }
 }
 
 // GFG data handle
-async function handleGFGData(req, res) {
-    try {
-        const { username } = req.params;
+async function handleGFGData( username ) {
         const gfgURL = `https://www.geeksforgeeks.org/user/${username}`;
 
         const response = await fetch(gfgURL);
@@ -266,27 +248,12 @@ async function handleGFGData(req, res) {
                 ratingData: userData.contestData.user_contest_data.contest_data,
             }
 
-            res.status(200).send(userProfileData);
+            console.log(userProfileData)
+            return userProfileData;
         }
         else {
-            res.status(response.status).send("Error fetching data from GFG");
+            return 0;
         }
-
-    } catch (error) {
-        res.status(500).send("Internal Server Error");
-    }
 }
 
-// To send all user data to the client
-async function handleUserData(req, res) {
-    try {
-        const { username } = req.params;
-        const userdata = await UserData.find({username});
-        
-        res.status(200).json(userdata);
-    } catch (error) {
-        res.status(500).send("Internal Server Error");
-    }
-}
-
-module.exports = { handleRoot, handleCodeChefData, handleCodeforcesData, handleLeetcodeData, handleGFGData, handleUserData };
+module.exports = { handleRoot, handleCodeChefData, handleCodeforcesData, handleLeetcodeData, handleGFGData };

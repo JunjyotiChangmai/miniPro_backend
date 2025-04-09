@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
 const userDataSchema = new mongoose.Schema({
     name: { type: String, required: true },
     username : { type : String, required : true, unique: true},
+    codechefusername : { type : String},
+    codeforcesusername : { type : String},
+    gfgusername : { type : String},
+    leetcodeusername : { type : String},
     institute: { type: String },
     isVerified: { type: Boolean, default: false },
     profilePicture: { type: String },
@@ -20,6 +24,9 @@ const userDataSchema = new mongoose.Schema({
       gfg: { type: Object }
     },
     totalProblemsSolved: { type: Number, default: 0 },
+    score: { type: Number, default: 0 },
+    instituteRank: { type: Number, default: 0 },
+    globalRank: { type: Number, default: 0 },
     lastUpdated: { type: Date, default: Date.now },
   }, { timestamps: true });
   

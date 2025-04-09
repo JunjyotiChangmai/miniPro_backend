@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const router = require("./routes/api.js")
+const router = require("./routes/api.js");
 
 const port = process.env.PORT;
 const mongoDB_url = process.env.mongoDB;
