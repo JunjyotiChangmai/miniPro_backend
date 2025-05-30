@@ -22,7 +22,7 @@ async function handleCodeChefData( username ) {
             const problemSolvedElement = document.querySelector('.rating-data-section.problems-solved').lastElementChild;
             const totalProb = problemSolvedElement.innerHTML.split(" ")[3];
 
-            const newData = { problemSolve: parseInt(totalProb), };
+            const newData = { problemSolved: parseInt(totalProb), };
 
             const userProfileData = { ...newData, ...CCProfile };
 
@@ -65,14 +65,27 @@ async function handleCodeforcesData( username ) {
             value: dateCounts[date]
         }));
 
+
+        const targetUrl = `https://codeforces.com/profile/${username}`;
+        const response = await fetch(targetUrl);
+        const d = await response.text();
+        const data = { data: d };
+        const dom = new JSDOM(data.data);
+        const document = dom.window.document;
+        const problemSolvedElement = document.querySelector('._UserActivityFrame_counterValue').innerHTML.split(" ")[0];
+
+        
+        const problemSolved = parseInt(problemSolvedElement);
+
         const userProfileData = {
             userInfo: userData.result,
             heatMap: heatMapData,
             ratingData: userRatingList.result,
         };
 
-        console.log(userProfileData)
-        return userProfileData;
+        userProfileData.userInfo[0].problemSolved = problemSolved || 0
+
+        return userProfileData;        
 }
 
 // Leetcode data handle
@@ -194,7 +207,11 @@ async function handleLeetcodeData( username ) {
 
             const userProfileData = ({...userResData, ...userContestResData});
 
-            console.log(userProfileData)
+            
+            userProfileData.profile.problemSolved = userProfileData.submitStats.acSubmissionNum.find(
+                stat => stat.difficulty === 'All'
+            )?.count || 0;
+            
             return userProfileData;
         } else {
             return 0;
@@ -248,7 +265,6 @@ async function handleGFGData( username ) {
                 ratingData: userData.contestData.user_contest_data.contest_data,
             }
 
-            console.log(userProfileData)
             return userProfileData;
         }
         else {

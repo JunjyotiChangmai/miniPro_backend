@@ -52,28 +52,29 @@ async function updateUserCodingProfile(req, res) {
         if (userdata.codechefusername) {
             const codechefData = await handleCodeChefData(userdata.codechefusername);
             userdata.codingProfiles.codechef = codechefData;
-            totalProblemSolved += codechefData.totalProblemSolved;
+            totalProblemSolved += codechefData.problemSolved;
         }
 
         if (userdata.codeforcesusername) {
             const codeforcesData = await handleCodeforcesData(userdata.codeforcesusername);
             userdata.codingProfiles.codeforces = codeforcesData;
-            totalProblemSolved += codeforcesData.totalProblemSolved;
+            totalProblemSolved += codeforcesData.userInfo[0].problemSolved;
         }
 
         if (userdata.gfgusername) {
             const gfgData = await handleGFGData(userdata.gfgusername);
             userdata.codingProfiles.gfg = gfgData;
-            totalProblemSolved += gfgData.totalProblemSolved;
+            totalProblemSolved += gfgData.userInfo.total_problems_solved;
         }
 
         if (userdata.leetcodeusername) {
             const leetcodeData = await handleLeetcodeData(userdata.leetcodeusername);
             userdata.codingProfiles.leetcode = leetcodeData;
-            totalProblemSolved += leetcodeData.totalProblemSolved;
+            totalProblemSolved += leetcodeData.profile.problemSolved;
         }
 
-        userdata.totalProblemSolved = totalProblemSolved;
+        userdata.totalProblemsSolved = totalProblemSolved;
+        
         await userdata.save();
 
         return res.status(200).json({
