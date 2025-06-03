@@ -37,6 +37,58 @@ async function addCodingProfileData(req, res) {
     }
 }
 
+//to update personal details
+async function updateDetails(req, res) {
+    try {
+        const { username, name, about, country, institute, degree, branch, yearofpass } = req.body;
+        const userdata = await UserData.findOne({ username });
+
+        if (!userdata) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if(name) userdata.name = name;
+        if(about) userdata.about = about;
+        if(country) userdata.country = country;
+        if(institute) userdata.institute = institute;
+        if(degree) userdata.degree = degree;
+        if(branch) userdata.branch = branch;
+        if(yearofpass) userdata.yearofpass = yearofpass;
+
+        await userdata.save();
+
+        res.status(200).json({message: "added"});
+
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+//tp add social media accounts
+async function addSocialMedia(req, res) {
+    try {
+        const { username, linkedin, twitter, instagram, facebook, resume } = req.body;
+        const userdata = await UserData.findOne({ username });
+
+        if (!userdata) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if(linkedin) userdata.social.linkedin = linkedin;
+        if(twitter) userdata.social.twitter = twitter;
+        if(instagram) userdata.social.instagram = instagram;
+        if(facebook) userdata.social.facebook = facebook;
+        if(resume) userdata.social.resume = resume;
+
+        await userdata.save();
+
+        res.status(200).json({message: "added"});
+
+    } catch (error) {
+        res.status(500).send("Internal Server Error");
+    }
+}
+
 // to update coding profile data
 async function updateUserCodingProfile(req, res) {
     try {
@@ -87,4 +139,4 @@ async function updateUserCodingProfile(req, res) {
     }
 }
 
-module.exports = { handleUserData, updateUserCodingProfile, addCodingProfileData };
+module.exports = { handleUserData, updateUserCodingProfile, addCodingProfileData, addSocialMedia, updateDetails };
