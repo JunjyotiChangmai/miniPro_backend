@@ -128,11 +128,8 @@ async function updateUserCodingProfile(req, res) {
         userdata.totalProblemsSolved = totalProblemSolved;
         
         await userdata.save();
-
-        return res.status(200).json({
-            message: "Coding profile updated successfully",
-            user: userdata
-        });
+        
+        res.status(200).json(userdata);
 
     } catch (error) {
         res.status(500).send("Internal Server Error");
