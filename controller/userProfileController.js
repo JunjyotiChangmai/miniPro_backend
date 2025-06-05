@@ -5,8 +5,8 @@ const { handleCodeChefData, handleCodeforcesData, handleGFGData, handleLeetcodeD
 async function handleUserData(req, res) {
     try {
         const { username } = req.params;
-        const userdata = await UserData.find({username});
-        
+        const userdata = await UserData.find({ username });
+
         res.status(200).json(userdata);
     } catch (error) {
         res.status(500).send("Internal Server Error");
@@ -23,14 +23,14 @@ async function addCodingProfileData(req, res) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if(codechefusername) userdata.codechefusername = codechefusername;
-        if(codeforcesusername) userdata.codeforcesusername = codeforcesusername;
-        if(gfgusername) userdata.gfgusername = gfgusername;
-        if(leetcodeusername) userdata.leetcodeusername = leetcodeusername;
+        if (codechefusername) userdata.codechefusername = codechefusername;
+        if (codeforcesusername) userdata.codeforcesusername = codeforcesusername;
+        if (gfgusername) userdata.gfgusername = gfgusername;
+        if (leetcodeusername) userdata.leetcodeusername = leetcodeusername;
 
         await userdata.save();
 
-        res.status(200).json({message: "added"});
+        res.status(200).json({ message: "added" });
 
     } catch (error) {
         res.status(500).send("Internal Server Error");
@@ -47,17 +47,17 @@ async function updateDetails(req, res) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if(name) userdata.name = name;
-        if(about) userdata.about = about;
-        if(country) userdata.country = country;
-        if(institute) userdata.institute = institute;
-        if(degree) userdata.degree = degree;
-        if(branch) userdata.branch = branch;
-        if(yearofpass) userdata.yearofpass = yearofpass;
+        if (name) userdata.name = name;
+        if (about) userdata.about = about;
+        if (country) userdata.country = country;
+        if (institute) userdata.institute = institute;
+        if (degree) userdata.degree = degree;
+        if (branch) userdata.branch = branch;
+        if (yearofpass) userdata.yearofpass = yearofpass;
 
         await userdata.save();
 
-        res.status(200).json({message: "added"});
+        res.status(200).json({ message: "added" });
 
     } catch (error) {
         res.status(500).send("Internal Server Error");
@@ -74,15 +74,15 @@ async function addSocialMedia(req, res) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if(linkedin) userdata.social.linkedin = linkedin;
-        if(twitter) userdata.social.twitter = twitter;
-        if(instagram) userdata.social.instagram = instagram;
-        if(facebook) userdata.social.facebook = facebook;
-        if(resume) userdata.social.resume = resume;
+        if (linkedin) userdata.social.linkedin = linkedin;
+        if (twitter) userdata.social.twitter = twitter;
+        if (instagram) userdata.social.instagram = instagram;
+        if (facebook) userdata.social.facebook = facebook;
+        if (resume) userdata.social.resume = resume;
 
         await userdata.save();
 
-        res.status(200).json({message: "added"});
+        res.status(200).json({ message: "added" });
 
     } catch (error) {
         res.status(500).send("Internal Server Error");
@@ -112,7 +112,7 @@ async function updateUserCodingProfile(req, res) {
             userdata.codingProfiles.codechef = codechefData;
             totalProblemSolved += codechefData.problemSolved;
             //score
-            codechefScore = 2*codechefData.problemSolved;
+            codechefScore = 2 * codechefData.problemSolved;
         }
 
         if (userdata.codeforcesusername) {
@@ -120,7 +120,7 @@ async function updateUserCodingProfile(req, res) {
             userdata.codingProfiles.codeforces = codeforcesData;
             totalProblemSolved += codeforcesData.userInfo[0].problemSolved;
             //score
-            codeforcesScore = 2*codeforcesData.userInfo[0].problemSolved;
+            codeforcesScore = 2 * codeforcesData.userInfo[0].problemSolved;
         }
 
         if (userdata.gfgusername) {
@@ -128,9 +128,9 @@ async function updateUserCodingProfile(req, res) {
             userdata.codingProfiles.gfg = gfgData;
             totalProblemSolved += gfgData.userInfo.total_problems_solved;
 
-            const gfgEasyScore = 1*Object.keys(gfgData.userSubmissionsInfo.Easy).length;
-            const gfgMediumScore = 2*Object.keys(gfgData.userSubmissionsInfo.Medium).length;
-            const gfgHardScore = 4*Object.keys(gfgData.userSubmissionsInfo.Hard).length;
+            const gfgEasyScore = 1 * Object.keys(gfgData.userSubmissionsInfo.Easy).length;
+            const gfgMediumScore = 2 * Object.keys(gfgData.userSubmissionsInfo.Medium).length;
+            const gfgHardScore = 4 * Object.keys(gfgData.userSubmissionsInfo.Hard).length;
 
             gfgScore = gfgEasyScore + gfgMediumScore + gfgHardScore;
         }
@@ -140,18 +140,18 @@ async function updateUserCodingProfile(req, res) {
             userdata.codingProfiles.leetcode = leetcodeData;
             totalProblemSolved += leetcodeData.profile.problemSolved;
 
-            const leetcodeEasyScore = 1*leetcodeData.submitStats.acSubmissionNum[1].count;
-            const leetcodeMediumScore = 2*leetcodeData.submitStats.acSubmissionNum[2].count;
-            const leetcodeHardScore = 4*leetcodeData.submitStats.acSubmissionNum[3].count;
+            const leetcodeEasyScore = 1 * leetcodeData.submitStats.acSubmissionNum[1].count;
+            const leetcodeMediumScore = 2 * leetcodeData.submitStats.acSubmissionNum[2].count;
+            const leetcodeHardScore = 4 * leetcodeData.submitStats.acSubmissionNum[3].count;
 
             leetcodeScore = leetcodeEasyScore + leetcodeMediumScore + leetcodeHardScore;
         }
 
         userdata.totalProblemsSolved = totalProblemSolved;
         userdata.score = codechefScore + codeforcesScore + leetcodeScore + gfgScore;
-        
+
         await userdata.save();
-        
+
         res.status(200).json(userdata);
 
     } catch (error) {
