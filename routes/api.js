@@ -3,6 +3,7 @@ const { handleRoot } = require("../controller/controller.js");
 const { handleSignup ,handleSignin } = require("../controller/userController.js");
 const { handleLeaderBoard } = require("../controller/rankController.js");
 const { updateUserCodingProfile, handleUserData, addCodingProfileData, updateDetails, addSocialMedia } = require("../controller/userProfileController.js");
+const { validateLeetcode, validateGFG, validateCodeforces, validateCodechef } = require("../controller/validateUser.js");
 
 const router = Router();
 
@@ -28,5 +29,11 @@ router.post("/signin", handleSignin); // working
 
 // Leaderboard router ...
 router.get("/leaderboard", handleLeaderBoard); // working
+
+// To validate username
+router.get('/validate/leetcode', validateLeetcode)
+router.get('/validate/gfg', validateGFG)
+router.get('/validate/codeforces', validateCodeforces)
+router.get('/validate/codechef', validateCodechef)
 
 module.exports = router;    
