@@ -32,9 +32,11 @@ async function updateRanks() {
 
 
 // Runs at 12:00 AM and 12:00 PM every day
-cron.schedule('0 */4 * * *', async () => {
+cron.schedule('0 */3 * * *', async () => {
     console.log('Starting scheduled rank update...');
     await updateRanks();
+},{
+    timezone: 'Asia/Kolkata'
 });
 
 async function handleLeaderBoard(req, res) {
